@@ -1,3 +1,5 @@
+import java.io.FileNotFoundException
+
 plugins {
     java
     id("io.qameta.allure") version "2.9.6"
@@ -18,6 +20,7 @@ tasks {
         }
 
         doLast {
+            // Unit test not four Allure. Dir allure-results must be empty
             val allureResult = buildDir.resolve("allure-results")
             if (allureResult.exists()) {
                 logger.error("Allure create result for Unit test")
@@ -26,11 +29,28 @@ tasks {
         }
     }
 
-    register("integrationTest", Test::class.java) {
+    val integrationTest = register("integrationTest", Test::class.java) {
         group = JavaBasePlugin.VERIFICATION_GROUP
         useJUnitPlatform {
             includeTags(integrationTag)
         }
+
+        shouldRunAfter(test)
+
+        doLast {
+            // Integration test four Allure. Dir allure-results must be exist
+            val allureResult = buildDir.resolve("allure-results")
+            if (!allureResult.exists()) {
+                logger.error("Allure not create result for Unit test")
+                throw FileNotFoundException(allureResult.path)
+            }
+        }
+
+
+    }
+
+    check {
+        dependsOn(integrationTest)
     }
 }
 
