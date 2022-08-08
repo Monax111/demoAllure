@@ -26,6 +26,16 @@ tasks {
                 logger.error("Allure create result for Unit test")
                 throw FileAlreadyExistsException(allureResult)
             }
+
+            allure {
+                adapter {
+                    frameworks {
+                        junit5 {
+                            enabled.set(true)
+                        }
+                    }
+                }
+            }
         }
     }
 
