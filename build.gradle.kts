@@ -22,7 +22,7 @@ tasks {
         doLast {
             // Unit test not four Allure. Dir allure-results must be empty
             val allureResult = buildDir.resolve("allure-results")
-            if (allureResult.exists()) {
+            if (allureResult.listFiles()!!.count() > 1) { //исключаем executor.json
                 logger.error("Allure create result for Unit test")
                 throw FileAlreadyExistsException(allureResult)
             }
@@ -40,7 +40,7 @@ tasks {
         doLast {
             // Integration test four Allure. Dir allure-results must be exist
             val allureResult = buildDir.resolve("allure-results")
-            if (!allureResult.exists()) {
+            if (allureResult.listFiles()!!.count() < 2) { //исключаем executor.json
                 logger.error("Allure not create result for Unit test")
                 throw FileNotFoundException(allureResult.path)
             }
@@ -64,3 +64,13 @@ repositories {
     mavenCentral()
 }
 
+allure {
+    adapter {
+        aspectjWeaver.set(false)
+        frameworks {
+            junit5 {
+                enabled.set(false)
+            }
+        }
+    }
+}
